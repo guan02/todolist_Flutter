@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MyApp(
+      items: List<ListItem>.generate(
+        10,
+        (i) => MessageItem('Sender $i', 'Message body $i'),
+      ),
+    ));
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  static const String _title = 'Flutter Stateful Clicker Counter';
+  const MyApp({super.key, required this.items});
+  static const String _title = 'todoList_Flutter';
+  final List<ListItem> items;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -30,56 +36,39 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final List<ListItem> items = [];
+  TextEditingController testcontroller = TextEditingController();
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text('Flutter Demo Click Counter'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: 25),
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: EdgeInsets.all(8),
+        children: [
+          for (var i in items)
+            Container(
+              alignment: Alignment.center,
+              color: Colors.grey,
+              width: double.infinity,
+              height: 100,
+              margin: EdgeInsets.only(bottom: 8),
+              child: (ListTile(
+                title: i.buildTitle(context),
+                subtitle: i.buildSubtitle(context),
+              )),
+            )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -90,3 +79,42 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+/// The base class for the different types of items the list can contain.
+abstract class ListItem {
+  /// The title line to show in a list item.
+  Widget buildTitle(BuildContext context);
+
+  /// The subtitle line, if any, to show in a list item.
+  Widget buildSubtitle(BuildContext context);
+}
+
+class HeadingItem implements ListItem {
+  final String heading;
+
+  HeadingItem(this.heading);
+
+  @override
+  Widget buildTitle(BuildContext context) {
+    return Text(
+      heading,
+      style: Theme.of(context).textTheme.headlineSmall,
+    );
+  }
+
+  @override
+  Widget buildSubtitle(BuildContext context) => const SizedBox.shrink();
+}
+
+/// A ListItem that contains data to display a message.
+class MessageItem implements ListItem {
+  final String sender;
+  final String body;
+
+  MessageItem(this.sender, this.body);
+
+  @override
+  Widget buildTitle(BuildContext context) => Text(sender);
+
+  @override
+  Widget buildSubtitle(BuildContext context) => Text(body);
+}
