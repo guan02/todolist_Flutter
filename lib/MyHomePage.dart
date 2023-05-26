@@ -13,10 +13,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<ListItem> items = [];
+  TextEditingController titlecontroller = TextEditingController();
   TextEditingController testcontroller = TextEditingController();
   void saveNewTask() {
     setState(() {
-      items.add(MessageItem("sender", testcontroller.text));
+      items.add(MessageItem(titlecontroller.text, testcontroller.text));
+      titlecontroller.clear();
       testcontroller.clear();
     });
     Navigator.of(context).pop();
@@ -28,6 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (context) {
         return DialogBox(
+          titolo: titlecontroller,
           controller: testcontroller,
           onSave: saveNewTask,
           onCancel: () => Navigator.of(context).pop(),
